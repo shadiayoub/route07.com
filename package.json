@@ -1,0 +1,27 @@
+{
+  "name": "route07-react",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A simple React recreation of route07.com",
+  "scripts": {
+    "dev": "concurrently -k -n web,api -c cyan,magenta \"vite\" \"node --watch server/index.js\"",
+    "dev:web": "vite",
+    "dev:api": "node --watch server/index.js",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "preview": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "express": "^4.22.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resend": "^6.38.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.5",
+    "vite": "^5.4.11"
+  }
+}
