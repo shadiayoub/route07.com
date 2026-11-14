@@ -29,6 +29,7 @@ lerna-debug.log*
 !.env.*.example
 
 # Cache / tooling
+.vercel/
 .vite/
 .cache/
 .eslintcache

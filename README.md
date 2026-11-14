@@ -86,7 +86,31 @@ The endpoint validates the email address, escapes HTML, uses a hidden honeypot f
 | `npm start` | Run the Express server (serves `dist/` and the API) |
 | `npm run preview` | Build and then start the production server |
 
-## Production
+## Deploying to Vercel
+
+The project deploys as a static Vite site plus two serverless functions:
+
+- `api/contact.js` → `POST /api/contact`
+- `api/health.js` → `GET /api/health`
+
+Both reuse the shared logic in `server/contact.js`, so the Resend key stays on the server.
+
+**Required step — add environment variables in Vercel.** `.env` is git-ignored and is *not* deployed. In **Project → Settings → Environment Variables**, add these for Production (and Preview):
+
+| Name | Value |
+| --- | --- |
+| `RESEND_API_KEY` | `re_...` (your Resend sending key) |
+| `CONTACT_TO_EMAIL` | `support@route07.com` |
+| `RESEND_FROM_EMAIL` | `website@route07.com` |
+| `RESEND_FROM_NAME` | `Route07` |
+
+Then **redeploy** (env changes only apply to new deployments).
+
+`vercel.json` sets the Vite framework, `dist` output, and a 15s function timeout. No rewrites are needed: Vercel routes `/api/*` to the functions and everything else to the SPA.
+
+> Without those env vars the form returns `503` with "Email is not configured yet." A missing `/api/contact` route (404) means the `api/` functions were not deployed — check the build logs and redeploy.
+
+## Self-hosted production (Express)
 
 ```bash
 npm run preview
@@ -99,14 +123,18 @@ npm run build
 npm start
 ```
 
-Set the environment variables on the host. Use HTTPS in production and verify the sending domain in Resend before going live.
+Set the same environment variables on the host. Use HTTPS in production and verify the sending domain in Resend before going live.
 
 ## Project structure
 
 ```
 .
+├── api/
+│   ├── contact.js            Vercel function → POST /api/contact
+│   └── health.js             Vercel function → GET /api/health
 ├── server/
-│   └── index.js              Express server, Resend contact endpoint, rate limiting
+│   ├── contact.js            Shared validation, rate limiting, Resend send
+│   └── index.js              Express server for local/self-hosted use
 ├── src/
 │   ├── App.jsx               Page composition + scroll-reveal observer
 │   ├── index.css             All styles, responsive rules, animations
@@ -126,7 +154,9 @@ Set the environment variables on the host. Use HTTPS in production and verify th
 │   ├── logo.png              Route07 logo
 │   └── parallax.jpg          Hero background texture
 ├── .env.example              Environment variable template
+├── .vercelignore             Keeps .env and build output out of CLI uploads
 ├── index.html                HTML shell + fonts
+├── vercel.json               Vercel build/output/function config
 ├── vite.config.js            Vite config with /api proxy
 └── package.json
 ```

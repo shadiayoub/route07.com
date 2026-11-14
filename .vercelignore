@@ -1,0 +1,8 @@
+# Keep local secrets and build output out of Vercel CLI uploads.
+# (Git-based deploys already exclude .env because it is git-ignored.)
+.env
+.env.*
+!.env.example
+node_modules
+dist
+.git
